@@ -11,9 +11,14 @@ prompt.start();
 const NodeCouchDb = require('node-couchdb');
  
 // node-couchdb instance with default options 
-const couch = new NodeCouchDb();
+const couch = new NodeCouchDb({
+	 auth: {
+        user: "Loic_Michoud",
+        password: "secret"
+    }
+});
  
-// node-couchdb instance with Memcached 
+/*// node-couchdb instance with Memcached 
 const MemcacheNode = require('node-couchdb-plugin-memcached');
 const couchWithMemcache = new NodeCouchDb({
     cache: new MemcacheNode
@@ -24,7 +29,7 @@ const couchExternal = new NodeCouchDb({
     host: 'couchdb.external.service',
     protocol: 'https',
     port: 5984
-});
+});*/
  
 // not admin party 
 /*const couchAuth = new NodeCouchDb({
@@ -33,6 +38,10 @@ const couchExternal = new NodeCouchDb({
         pass: "secret"
     }
 });*/
+
+var viewUrl='http://localhost:5984';
+
+
 var displayOptions = function(){
 	console.log("Welcome to your contacts manager!");
 	console.log("1: List contacts");
@@ -50,34 +59,29 @@ function addContact(contact, displayOptions)
 
     console.log('Command-line input received:');
     console.log('  name: ' + result.name);
-    console.log("premier");
     console.log(result.name);
     var slice=result.name.split(" ");
-    result.name=slice[0] + '_' + slice[1];
-    console.log("deuxieme");
+    name_enter=slice[0] + '_' + slice[1];
     console.log(result.name);
-    createDatabase(contact);
+    couch.listDatabases().then(function(dbs){
+    var controller = 0;
+    for(var i= 0; i <= dbs.length; i++){
+        if(result.name== dbs[i]){
+            controller += 1;
+        }
+    }
+    if(controller == 0){
+        couch.createDatabase(result.name).then(function(){
+         console.log('Contact added');
+     },
+     function(err){
+         res.send(err);
+     });
+    }
 	});
+});
 }
 
-function createDatabase(contact, callback){
-	var nano = require('nano')('http://Loic_Michoud:secret@localhost/');
-	console.log("coucou 1");
-	var http = require("http"); 
-	console.log("coucou 2");
-	var server = http.createServer(function (request, response) { 
-	console.log("coucou 3");
-	    nano.db.create(result.name, function (err, body, header) { 
-	        if (err) { 
-	            console.log(500, { "Content-Type": "text/plain" }); 
-	            console.log("Database creation failed. " + err + "\n"); 
-	        } else { 
-	            console.log(200, { "Content-Type": "text/plain" }); 
-	            console.log("Database created. Response: " + JSON.stringify(body) + "\n"); 
-	        } 
-	    }); 
-	}); 
-}
 	
 
 

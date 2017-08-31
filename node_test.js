@@ -2,6 +2,7 @@ var contacts;
 var prompt = require('prompt');
 
 var name_choice="max michoud";
+var name_delete="maman michoud";
 // 
 // Start the prompt 
 // 
@@ -23,7 +24,7 @@ var viewUrl='http://localhost:5984';
 
  // hapi configuration
 
-
+/*
 const Hapi = require('hapi');
 
 const server = new Hapi.Server();
@@ -42,7 +43,7 @@ server.start((err) => {
         throw err;
     }
     console.log(`Server running at: ${server.info.uri}`);
-});
+});*/
 
 
 
@@ -103,9 +104,24 @@ function display(dbs){
     //function affichage(dbs){
 	var slice=dbs.split("_");
 		console.log("Last name: "+slice[1]+", first name: "+slice[0]);
-//}	
-	console.log("apres affichage");
 
+}
+
+function funcdelete(name_delete, displayOptions)
+{
+	var slice=name_delete.split(" ");
+    name_delete=slice[0] + '_' + slice[1];
+    console.log("nom final: "+name_delete);
+	couch.listDatabases().then(function(dbs){
+    	for(var i= 0; i <= dbs.length; i++){
+    		console.log("nom: "+i + ": "+dbs[i]);
+        	if(name_delete== dbs[i]){
+            	couch.dropDatabase(name_delete).then(function(){
+				console.log("contact deleted")
+        		});
+   			}
+		}
+	});
 }
 
 
@@ -133,8 +149,11 @@ var callback = function (err, result) {
 		case "2":
 			addContact(name_choice, displayOptions);
 		break;
+		case "3":
+			funcdelete(name_delete, displayOptions);
+		break;
 		default:
-			console.log("wrong message: use 0 or 1 or 2");
+			console.log("wrong message: use 0 or 1 or 2 or 3");
 			displayOptions();
 
 	}

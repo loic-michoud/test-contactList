@@ -15,12 +15,4 @@ app.controller("myCtrl", function($scope) {
         $scope.errortext = "";    
         $scope.products.splice(x, 1);
     }
-    $http.get("/node_test.js").
-    success(function(data, status) {
-        $scope.donnees = data;
-        $scope.sucesstext="success";
-     }).
-    error(function(data, status) {
-        document.getElementById("erreur").innerHTML = "Erreur lors de l'appel du json"
-    });
 });

@@ -1,6 +1,7 @@
 var contacts;
 var prompt = require('prompt');
- 
+
+var name_choice="max michoud";
 // 
 // Start the prompt 
 // 
@@ -17,29 +18,38 @@ const couch = new NodeCouchDb({
         password: "secret"
     }
 });
- 
-/*// node-couchdb instance with Memcached 
-const MemcacheNode = require('node-couchdb-plugin-memcached');
-const couchWithMemcache = new NodeCouchDb({
-    cache: new MemcacheNode
-});
- 
-// node-couchdb instance talking to external service 
-const couchExternal = new NodeCouchDb({
-    host: 'couchdb.external.service',
-    protocol: 'https',
-    port: 5984
-});*/
- 
-// not admin party 
-/*const couchAuth = new NodeCouchDb({
-    auth: {
-        user: "Loic_Michoud",
-        pass: "secret"
-    }
-});*/
-
 var viewUrl='http://localhost:5984';
+
+
+ // hapi configuration
+
+
+const Hapi = require('hapi');
+
+const server = new Hapi.Server();
+server.connection({ port: 5984, host: 'localhost' });
+
+server.route({
+    method: 'GET',
+    path: '/angularjs.js',
+    handler: function (request, reply) {
+        request=dbs;
+    }
+});
+server.start((err) => {
+
+    if (err) {
+        throw err;
+    }
+    console.log(`Server running at: ${server.info.uri}`);
+});
+
+
+
+
+// functions
+
+
 
 
 var displayOptions = function(){
@@ -52,26 +62,27 @@ var displayOptions = function(){
 }
 
 // Create database
-function addContact(contact, displayOptions)
+function addContact(name_choice, displayOptions)
 {
-	console.log("Add contact:");
-	prompt.get(['name'], function (err, result) {
 
-    console.log('Command-line input received:');
-    console.log('  name: ' + result.name);
-    console.log(result.name);
-    var slice=result.name.split(" ");
-    name_enter=slice[0] + '_' + slice[1];
-    console.log(result.name);
+	//console.log("Add contact:");
+	//prompt.get(['name'], function (err, result) {
+
+   // console.log('Command-line input received:');
+   // console.log('  name: ' + result.name);
+   // console.log(result.name);
+    var slice=name_choice.split(" ");
+    name_choice=slice[0] + '_' + slice[1];
+   // console.log(result.name);
     couch.listDatabases().then(function(dbs){
     var controller = 0;
     for(var i= 0; i <= dbs.length; i++){
-        if(result.name== dbs[i]){
+        if(name_choice== dbs[i]){
             controller += 1;
         }
     }
     if(controller == 0){
-        couch.createDatabase(result.name).then(function(){
+        couch.createDatabase(name_choice).then(function(){
          console.log('Contact added');
      },
      function(err){
@@ -79,7 +90,7 @@ function addContact(contact, displayOptions)
      });
     }
 	});
-});
+//});
 }
 
 	
@@ -120,7 +131,7 @@ var callback = function (err, result) {
 			displayOptions();
 		break;
 		case "2":
-			addContact(displayOptions);
+			addContact(name_choice, displayOptions);
 		break;
 		default:
 			console.log("wrong message: use 0 or 1 or 2");
